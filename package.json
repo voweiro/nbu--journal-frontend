@@ -1,0 +1,35 @@
+{
+  "name": "nbu-journal-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@headlessui/react": "^2.2.3",
+    "@types/node": "^20.8.0",
+    "@types/react": "^18.2.24",
+    "@types/react-dom": "^18.2.8",
+    "@types/react-toastify": "^4.0.2",
+    "autoprefixer": "^10.4.16",
+    "axios": "^1.6.0",
+    "next": "^14.0.0",
+    "next-auth": "^4.24.0",
+    "postcss": "^8.4.31",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.45.0",
+    "react-icons": "^4.11.0",
+    "react-query": "^3.39.3",
+    "react-toastify": "^11.0.5",
+    "tailwindcss": "^3.3.3",
+    "typescript": "^5.2.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.51.0",
+    "eslint-config-next": "^14.0.0"
+  }
+}
