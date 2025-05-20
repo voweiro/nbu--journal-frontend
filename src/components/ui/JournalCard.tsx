@@ -4,8 +4,8 @@ import Image from 'next/image';
 import { Journal } from '@/types';
 import Badge from './Badge';
 import { getFileUrl } from '@/utils/fileHelper';
-// Import useAuth as a named import
 import { useAuth } from '../../contexts/AuthContext';
+import { FiCalendar, FiDownload, FiEye, FiFile, FiUser, FiUsers, FiXCircle } from 'react-icons/fi';
 
 interface JournalCardProps {
   journal: Journal;
@@ -123,127 +123,126 @@ const JournalCard: React.FC<JournalCardProps> = ({
   const journalUrl = `/journals/${journal.id}`;
 
   return (
-    <div className={`card hover:shadow-lg transition-shadow duration-200 ${className}`}>
-      <div className="p-4 flex flex-col h-full">
+    <div className={`bg-white border border-gray-200 rounded-lg hover:shadow-lg transition-all duration-200 ${className}`}>
+      <div className="p-5 flex flex-col h-full">
         {/* Status Banner */}
-        <div className={`-mx-4 -mt-4 px-4 py-2 mb-3 ${
-          journal.status === 'approved' || journal.status === 'published' ? 'bg-green-50' : 
-          journal.status === 'rejected' ? 'bg-red-50' : 
-          journal.status === 'received' || journal.status === 'assigned' || journal.status === 'being_reviewed' ? 'bg-blue-50' : 
-          'bg-gray-50'
+        <div className={`-mx-5 -mt-5 px-4 py-3 mb-4 flex items-center ${
+          journal.status === 'approved' || journal.status === 'published' ? 'bg-green-50 border-b border-green-100' : 
+          journal.status === 'rejected' ? 'bg-red-50 border-b border-red-100' : 
+          journal.status === 'received' || journal.status === 'assigned' || journal.status === 'being_reviewed' ? 'bg-blue-50 border-b border-blue-100' : 
+          'bg-gray-50 border-b border-gray-100'
         }`}>
-          <div className="flex items-center">
-            <span className="text-xl mr-2">{statusDetails.icon}</span>
-            <div>
-              <div className="flex items-center">
-                <span className={`font-medium mr-2 ${statusDetails.color}`}>
-                  Status: {journal.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                </span>
-                {getStatusBadge(journal.status)}
-              </div>
-              <p className="text-xs text-gray-600">{statusDetails.text}</p>
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 flex-shrink-0 ${
+            journal.status === 'approved' || journal.status === 'published' ? 'bg-green-100 text-green-600' : 
+            journal.status === 'rejected' ? 'bg-red-100 text-red-600' : 
+            journal.status === 'received' || journal.status === 'assigned' || journal.status === 'being_reviewed' ? 'bg-blue-100 text-blue-600' : 
+            'bg-gray-100 text-gray-600'
+          }`}>
+            {journal.status === 'published' && <FiEye size={18} />}
+            {journal.status === 'approved' && <FiEye size={18} />}
+            {journal.status === 'rejected' && <FiXCircle size={18} />}
+            {(journal.status === 'received' || journal.status === 'assigned' || journal.status === 'being_reviewed') && <FiFile size={18} />}
+            {journal.status === 'submitted' && <FiFile size={18} />}
+          </div>
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`font-medium ${
+                journal.status === 'approved' || journal.status === 'published' ? 'text-green-700' : 
+                journal.status === 'rejected' ? 'text-red-700' : 
+                journal.status === 'received' || journal.status === 'assigned' || journal.status === 'being_reviewed' ? 'text-blue-700' : 
+                'text-gray-700'
+              }`}>
+                {journal.status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+              </span>
+              {getStatusBadge(journal.status)}
             </div>
+            <p className="text-xs text-gray-600 mt-1">{statusDetails.text}</p>
           </div>
         </div>
         
         <div className="flex-1">
-          <div className="flex justify-between items-start mb-3">
-            <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
-              <Link href={`/journals/${journal.id}`} className="hover:text-primary-600">
-                {journal.title}
-              </Link>
+          <Link href={journalUrl} className="block group">
+            <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 group-hover:text-primary-600 transition-colors">
+              {journal.title}
             </h3>
-          </div>
-          
-          <p className="text-sm text-gray-600 mb-4 line-clamp-3">
+          </Link>
+
+          <div className="mt-3 mb-4 text-sm text-gray-600 line-clamp-3">
             {journal.abstract}
-          </p>
-          
-          {journal.publication_number && (
-            <div className="mb-2">
-              <span className="text-xs font-medium text-gray-500">Publication Number:</span>
-              <span className="ml-1 text-sm">{journal.publication_number}</span>
-            </div>
-          )}
-          
-          {journal.published_date && (
-            <div className="mb-2">
-              <span className="text-xs font-medium text-gray-500">Published:</span>
-              <span className="ml-1 text-sm">{formatDate(journal.published_date)}</span>
-            </div>
-          )}
-        </div>
-        
-        <div className="mt-4 pt-4 border-t border-gray-100">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200">
-                  {journal.publisher_profile_picture ? (
-                    <Image 
-                      src={getFileUrl(journal.publisher_profile_picture)}
-                      alt={`${journal.publisher_first_name} ${journal.publisher_last_name}`}
-                      width={40}
-                      height={40}
-                      className="object-cover w-full h-full"
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center w-full h-full bg-primary-100 text-primary-600 font-medium text-sm">
-                      {journal.publisher_first_name?.charAt(0) || 'U'}
-                      {journal.publisher_last_name?.charAt(0) || 'U'}
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-900">
-                  {journal.publisher_first_name && journal.publisher_last_name
-                    ? `${journal.publisher_first_name} ${journal.publisher_last_name}`
-                    : 'Journal Publisher'}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {formatDate(journal.created_at)}
-                </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+            <div className="flex items-center text-xs text-gray-600">
+              <FiCalendar size={14} className="mr-2 text-gray-400" />
+              <div>
+                <span className="font-medium block">Submitted</span>
+                {formatDate(journal.created_at)}
               </div>
             </div>
             
-            <div className="flex space-x-2">
-              {journal.status === 'published' && canUnpublish && (
-                <button
-                  onClick={async (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const confirmUnpublish = window.confirm('Are you sure you want to unpublish this journal? It will no longer be visible to the public.');
-                    if (confirmUnpublish) {
-                      try {
-                        if (onUnpublish) {
-                          await onUnpublish(journal.id);
-                        } else if (window.onUnpublishJournal) {
-                          window.onUnpublishJournal(journal.id);
-                        }
-                      } catch (error) {
-                        console.error('Error unpublishing journal:', error);
-                      }
-                    }
-                  }}
-                  disabled={isUnpublishing}
-                  className={`inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium ${
-                    isUnpublishing 
-                      ? 'text-gray-400 bg-gray-100 border-gray-200 cursor-not-allowed' 
-                      : 'text-red-600 bg-red-50 hover:bg-red-100 border-red-200'
-                  } rounded-md border transition-colors duration-200`}
-                >
-                  {isUnpublishing ? 'Unpublishing...' : 'Unpublish'}
-                </button>
-              )}
-              <Link 
-                href={journalUrl}
-                className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-md shadow-sm transition-colors duration-200"
-              >
-                View Details
-              </Link>
-            </div>
+            {journal.status === 'published' && journal.published_date && (
+              <div className="flex items-center text-xs text-gray-600">
+                <FiCalendar size={14} className="mr-2 text-gray-400" />
+                <div>
+                  <span className="font-medium block">Published</span>
+                  {formatDate(journal.published_date)}
+                </div>
+              </div>
+            )}
+            
+            {journal.publisher_first_name && (
+              <div className="flex items-center text-xs text-gray-600">
+                <FiUser size={14} className="mr-2 text-gray-400" />
+                <div>
+                  <span className="font-medium block">Publisher</span>
+                  {journal.publisher_first_name} {journal.publisher_last_name}
+                </div>
+              </div>
+            )}
+            
+            {journal.reviewer_first_name && (
+              <div className="flex items-center text-xs text-gray-600">
+                <FiUser size={14} className="mr-2 text-gray-400" />
+                <div>
+                  <span className="font-medium block">Reviewer</span>
+                  {journal.reviewer_first_name} {journal.reviewer_last_name}
+                </div>
+              </div>
+            )}
           </div>
+        </div>
+
+        <div className="flex flex-wrap justify-between items-center gap-3 mt-auto pt-4 border-t border-gray-100">
+          <Link 
+            href={journalUrl} 
+            className="inline-flex items-center text-primary-600 hover:text-primary-700 text-sm font-medium hover:underline"
+          >
+            <FiEye size={16} className="mr-1" />
+            View Details
+          </Link>
+          
+          {journal.file_path && (
+            <a 
+              href={getFileUrl(journal.file_path)} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="inline-flex items-center text-gray-600 hover:text-gray-800 text-sm font-medium hover:underline"
+            >
+              <FiDownload size={16} className="mr-1" />
+              Download
+            </a>
+          )}
+
+          {canUnpublish && journal.status === 'published' && onUnpublish && (
+            <button 
+              onClick={() => onUnpublish(journal.id)}
+              disabled={isUnpublishing}
+              className="inline-flex items-center text-red-600 hover:text-red-700 text-sm font-medium hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <FiXCircle size={16} className="mr-1" />
+              {isUnpublishing ? 'Processing...' : 'Unpublish'}
+            </button>
+          )}
         </div>
       </div>
     </div>

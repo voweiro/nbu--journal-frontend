@@ -4,10 +4,28 @@ import { User, Journal, JournalStatus, JournalFilters } from '@/types';
 // Check if code is running in browser environment
 const isBrowser = typeof window !== 'undefined';
 
-// IMPORTANT: Hard-coded backend URL to avoid any caching issues
-const BACKEND_URL = 'https://nbu-journal-backend.onrender.com/api';
+// Determine the API URL based on environment variables
+const getApiBaseUrl = () => {
+  // Use the environment variable if available
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  
+  // Fallback values based on environment
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:8000/api';
+  }
+  
+  // Production fallback
+  return 'https://nbu-journal-backend.onrender.com/api';
+};
 
-// Create axios instance with the fixed backend URL
+const BACKEND_URL = getApiBaseUrl();
+
+// Log the API URL for debugging
+console.log('Using API URL:', BACKEND_URL);
+
+// Create axios instance with the appropriate backend URL
 const api = axios.create({
   baseURL: BACKEND_URL,
   headers: {

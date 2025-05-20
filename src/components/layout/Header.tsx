@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserRole } from '@/types';
 import { getFileUrl } from '@/utils/fileHelper';
+import { FiMenu, FiX, FiUser, FiLogOut, FiHome, FiBook, FiUsers, FiFileText, FiSettings } from 'react-icons/fi';
 
 const Header: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();

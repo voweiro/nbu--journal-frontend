@@ -401,48 +401,80 @@ const JournalDetailPage: React.FC = () => {
                 
                 {/* Publication details for published journals */}
                 {journal.status === JournalStatus.PUBLISHED && (
-                  <div className="bg-blue-50 border border-blue-100 rounded-md p-4 mb-6">
-                    <h3 className="font-medium text-blue-800 mb-2">Publication Details</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-                      <div>
-                        <span className="font-medium text-gray-700">Publication Number:</span>{' '}
-                        <span>{journal.publication_number}</span>
+                  <div className="bg-blue-50 border border-blue-100 rounded-md p-4 mb-6 shadow-sm">
+                    <h3 className="font-semibold text-blue-800 mb-3 flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      Publication Details
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                      <div className="bg-white p-2 rounded-md shadow-sm">
+                        <span className="font-medium text-gray-700 block md:inline">Publication Number:</span>{' '}
+                        <span className="text-primary-600">{journal.publication_number}</span>
                       </div>
-                      <div>
-                        <span className="font-medium text-gray-700">Published Date:</span>{' '}
+                      <div className="bg-white p-2 rounded-md shadow-sm">
+                        <span className="font-medium text-gray-700 block md:inline">Published Date:</span>{' '}
                         <span>{formatDate(journal.published_date || journal.updated_at || journal.created_at)}</span>
                       </div>
                     </div>
                   </div>
                 )}
 
-                <div className="mb-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Abstract</h3>
-                  <p className="text-gray-700 whitespace-pre-line">{journal.abstract}</p>
+                <div className="mb-6 bg-white p-5 rounded-lg shadow-sm border border-gray-100">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
+                    </svg>
+                    Abstract
+                  </h3>
+                  <p className="text-gray-700 whitespace-pre-line leading-relaxed">{journal.abstract}</p>
                 </div>
 
-                <div className="mb-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Authors</h3>
+                <div className="mb-6 bg-white p-5 rounded-lg shadow-sm border border-gray-100">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    Authors
+                  </h3>
                   {journal.authors && journal.authors.length > 0 ? (
-                    <ul className="space-y-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {journal.authors.map((author) => (
-                        <li key={author.id} className="flex items-start">
-                          <span className="inline-block w-2 h-2 rounded-full bg-primary-500 mt-2 mr-2"></span>
+                        <div key={author.id} className="flex items-start p-3 rounded-md border border-gray-100 hover:border-primary-200 hover:bg-primary-50 transition-colors">
+                          <div className="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center mr-3 flex-shrink-0">
+                            {author.author_name.charAt(0).toUpperCase()}
+                          </div>
                           <div>
-                            <span className="font-medium">{author.author_name}</span>
-                            {author.is_primary && <span className="ml-2 text-xs text-primary-600">(Primary)</span>}
+                            <div className="font-medium text-gray-900">{author.author_name}</div>
+                            {author.is_primary && <span className="inline-block px-2 py-1 text-xs bg-primary-100 text-primary-700 rounded-full mt-1 mb-1">Primary Author</span>}
                             {author.author_email && (
-                              <div className="text-sm text-gray-600">{author.author_email}</div>
+                              <div className="text-sm text-gray-600 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                {author.author_email}
+                              </div>
                             )}
                             {author.author_department && (
-                              <div className="text-sm text-gray-600">{author.author_department}</div>
+                              <div className="text-sm text-gray-600 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                </svg>
+                                {author.author_department}
+                              </div>
                             )}
                           </div>
-                        </li>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
                   ) : (
-                    <p className="text-gray-500">No authors listed</p>
+                    <div className="bg-gray-50 p-4 rounded-md text-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 mx-auto text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                      </svg>
+                      <p className="text-gray-500">No authors listed for this journal</p>
+                    </div>
                   )}
                 </div>
 

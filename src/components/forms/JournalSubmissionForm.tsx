@@ -81,10 +81,25 @@ const JournalSubmissionForm: React.FC = () => {
       formData.append('journalFile', journalFile);
       formData.append('authors', JSON.stringify(data.authors));
       
+      console.log('Submitting journal with data:', {
+        title: data.title,
+        abstract: data.abstract.substring(0, 30) + '...',
+        fileName: journalFile.name,
+        fileSize: journalFile.size,
+        authors: data.authors.length
+      });
+      
       const response = await journalAPI.createJournal(formData);
       
+      console.log('Journal submission successful:', response);
+      
       // Redirect to journal details page
-      router.push(`/journals/${response.journal.id}`);
+      if (response && response.journal && response.journal.id) {
+        router.push(`/journals/${response.journal.id}`);
+      } else {
+        console.error('Invalid response format:', response);
+        setError('Received invalid response from server');
+      }
     } catch (error: any) {
       console.error('Journal submission error:', error);
       setError(error.response?.data?.message || 'Failed to submit journal');
