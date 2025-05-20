@@ -1,56 +1,19 @@
-import axios from 'axios';
 import { User, Journal, JournalStatus, JournalFilters } from '@/types';
+import corsAwareApi from './corsAwareApi';
 
-// Check if code is running in browser environment
-const isBrowser = typeof window !== 'undefined';
+// Use the CORS-aware API client instead of creating a new one
+const api = corsAwareApi;
 
-// Determine the API URL based on environment variables
-const getApiBaseUrl = () => {
-  // Use the environment variable if available
+// Export the base URL for use in other parts of the application
+export const getApiBaseUrl = () => {
   if (process.env.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL;
   }
-  
-  // Fallback values based on environment
-  if (process.env.NODE_ENV === 'development') {
-    return 'http://localhost:8000/api';
-  }
-  
-  // Production fallback
-  return 'https://nbu-journal-backend.onrender.com/api';
+  return 'https://nbu-journal-api.onrender.com/api';
 };
 
-const BACKEND_URL = getApiBaseUrl();
-
-// Log the API URL for debugging
-console.log('Using API URL:', BACKEND_URL);
-
-// Create axios instance with the appropriate backend URL
-const api = axios.create({
-  baseURL: BACKEND_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  withCredentials: true, // Important for cookies/auth if needed
-});
-
-console.log('API configured with URL:', BACKEND_URL);
-
-// Add auth token to requests if available
-api.interceptors.request.use(
-  (config) => {
-    // Only try to get token from localStorage in browser environment
-    if (isBrowser) {
-      const token = localStorage.getItem('token');
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    }
-    console.log('Making request to:', config.url, 'with baseURL:', config.baseURL);
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+// Export the API base URL for use in other components
+export const BACKEND_URL = getApiBaseUrl();
 
 // Auth API
 export const authAPI = {
