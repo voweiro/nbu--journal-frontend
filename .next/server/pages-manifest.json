@@ -2,8 +2,7 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/forgot-password": "pages/forgot-password.js",
   "/login": "pages/login.js",
-  "/journals/published/[id]": "pages/journals/published/[id].js",
+  "/forgot-password": "pages/forgot-password.js",
   "/": "pages/index.js"
 }

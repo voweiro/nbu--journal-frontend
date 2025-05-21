@@ -11,16 +11,24 @@ const ResetPasswordPage: React.FC = () => {
   const { token, email } = router.query;
   const [isTokenVerified, setIsTokenVerified] = useState(false);
   
-  // Ensure we have both token and email
-  const hasRequiredParams = typeof token === 'string' && typeof email === 'string';
-  
   // Handle token verification success
   const handleVerified = () => {
     setIsTokenVerified(true);
   };
   
+  // Wait for router to be ready before checking params
+  useEffect(() => {
+    // Log the query parameters for debugging
+    if (router.isReady) {
+      console.log('Reset password query params:', router.query);
+    }
+  }, [router.isReady, router.query]);
+  
+  // Ensure we have both token and email
+  const hasRequiredParams = typeof token === 'string' && typeof email === 'string';
+  
   // If we don't have the required params, show an error
-  if (!hasRequiredParams && typeof window !== 'undefined' && router.isReady) {
+  if (router.isReady && !hasRequiredParams) {
     return (
       <Layout title="Reset Password | NBU Journal System">
         <div className="max-w-md mx-auto py-8">

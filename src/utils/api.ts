@@ -34,6 +34,8 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+import { getPasswordResetUrl } from './config';
+
 // Auth API
 export const authAPI = {
   register: async (formData: FormData) => {
@@ -82,7 +84,18 @@ export const authAPI = {
   },
 
   forgotPassword: async (email: string) => {
-    const response = await api.post('/auth/forgot-password', { email });
+    // Generate the correct password reset URL for the frontend
+    const resetUrl = getPasswordResetUrl(email, 'TOKEN_PLACEHOLDER');
+    const baseResetUrl = resetUrl.replace('TOKEN_PLACEHOLDER', '');
+
+    console.log('Sending password reset request with URL template:', baseResetUrl);
+
+    // Send the base URL to the backend so it can generate the correct link
+    const response = await api.post('/auth/forgot-password', { 
+      email,
+      reset_url_template: baseResetUrl
+    });
+
     return response.data;
   },
 
