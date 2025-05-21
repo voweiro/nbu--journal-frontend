@@ -12,8 +12,8 @@ export const getFrontendBaseUrl = (): string => {
     return window.location.origin;
   }
   
-  // Default fallback
-  return 'https://nbu-journal.vercel.app';
+  // Default fallback - use the correct Vercel deployment URL
+  return 'https://nbu-journal-frontend.vercel.app';
 };
 
 // Get the full URL for password reset
