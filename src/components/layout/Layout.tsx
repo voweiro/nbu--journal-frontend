@@ -1,11 +1,13 @@
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useState, useEffect } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 import Header from './Header';
 import Footer from './Footer';
 import Sidebar from './Sidebar';
 import HeroSlider from '@/components/ui/HeroSlider';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/router';
+import MobileNav from '@/components/layout/MobileNav'
 
 interface LayoutProps {
   children: ReactNode;
@@ -59,6 +61,25 @@ const Layout: React.FC<LayoutProps> = ({
       imageUrl: "/images/nbu-mss.jpg"
     }
   ];
+  // For mobile detection
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if we're on mobile when component mounts and when window resizes
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    // Check on mount
+    checkIfMobile();
+    
+    // Add resize listener
+    window.addEventListener('resize', checkIfMobile);
+    
+    // Clean up
+    return () => window.removeEventListener('resize', checkIfMobile);
+  }, []);
+
   // If user is authenticated, use the sidebar layout
   if (isAuthenticated) {
     return (
@@ -71,10 +92,23 @@ const Layout: React.FC<LayoutProps> = ({
         </Head>
         
         <div className="flex min-h-screen bg-gray-50">
-          <Sidebar onToggle={handleSidebarToggle} />
+          {/* Show sidebar on desktop, hide on mobile */}
+          <div className="hidden md:block">
+            <Sidebar onToggle={handleSidebarToggle} />
+          </div>
           
-          <main className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
-            <div className="p-6">
+          {/* Mobile header for authenticated users */}
+          <div className="fixed top-0 left-0 right-0 z-40 md:hidden">
+            <div className="bg-gradient-to-r from-primary-900 to-primary-700 text-white shadow-lg px-4 py-3 flex justify-between items-center">
+              <Link href="/" className="flex items-center">
+                <span className="text-xl font-bold">NBU Journal</span>
+              </Link>
+              <MobileNav />
+            </div>
+          </div>
+          
+          <main className={`flex-1 transition-all duration-300 ${isMobile ? 'mt-14' : ''} ${!isMobile && sidebarCollapsed ? 'md:ml-16' : !isMobile ? 'md:ml-64' : ''}`}>
+            <div className="p-4 md:p-6">
               {children}
             </div>
           </main>
@@ -93,12 +127,14 @@ const Layout: React.FC<LayoutProps> = ({
         <link rel="icon" href="/favicon.ico" />
       </Head>
       
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen bg-gray-50">
         <Header />
         
         <main className="flex-1 pt-16">
           {shouldShowHero && <HeroSlider slides={heroSlides} />}
-          {children}
+          <div className="container mx-auto px-4 py-6 md:py-8">
+            {children}
+          </div>
         </main>
         
         <Footer />

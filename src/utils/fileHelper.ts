@@ -10,10 +10,16 @@
 export const parseGoogleDriveFile = (fileString: string | null): any => {
   if (!fileString) return null;
   
+  // If the string contains a URL prefix (like http://localhost:5000), remove it
+  let cleanString = fileString;
+  if (fileString.includes('http://localhost:5000')) {
+    cleanString = fileString.replace('http://localhost:5000', '');
+  }
+  
   try {
-    return JSON.parse(fileString);
+    return JSON.parse(cleanString);
   } catch (error) {
-    console.error('Error parsing Google Drive file info:', error);
+    console.error('Error parsing Google Drive file info:', error, 'Original string:', fileString);
     return null;
   }
 };
@@ -29,11 +35,27 @@ export const getFileUrl = (filePath: string | null, defaultImage: string = '/ima
   
   // Check if it's a Google Drive file (JSON string)
   if (filePath.startsWith('{')) {
-    const fileInfo = parseGoogleDriveFile(filePath);
-    if (fileInfo && fileInfo.downloadLink) {
-      return fileInfo.downloadLink;
+    try {
+      // Parse the Google Drive file info
+      const fileInfo = parseGoogleDriveFile(filePath);
+      
+      // Validate that we have a proper file info object with a download link
+      if (fileInfo && typeof fileInfo === 'object' && fileInfo.downloadLink) {
+        // Make sure we have a clean string URL
+        const downloadUrl = String(fileInfo.downloadLink).trim();
+        
+        // Verify it's a valid URL
+        if (downloadUrl.startsWith('http')) {
+          return downloadUrl;
+        }
+      }
+      
+      console.warn('Invalid Google Drive file info format:', fileInfo);
+      return defaultImage;
+    } catch (error) {
+      console.error('Error processing Google Drive file URL:', error, filePath);
+      return defaultImage;
     }
-    return defaultImage;
   }
   
   // Handle local file paths

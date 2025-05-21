@@ -109,7 +109,7 @@ const JournalSubmissionForm: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className=" space-y-6">
       {error && (
         <Alert 
           variant="danger" 

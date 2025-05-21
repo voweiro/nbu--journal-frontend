@@ -1,29 +1,41 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserRole } from '@/types';
 import { getFileUrl } from '@/utils/fileHelper';
-import { FiMenu, FiX, FiUser, FiLogOut, FiHome, FiBook, FiUsers, FiFileText, FiSettings } from 'react-icons/fi';
+import MobileNav from './MobileNav';
 
 const Header: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const router = useRouter();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-primary-800/80 text-white shadow-md">
-      <div className="container mx-auto px-4 py-3">
+    <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-gradient-to-r from-[#3498DB] to-[#E74C3C] text-white shadow-lg">
+      <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo and site name */}
           <div className="flex items-center space-x-2">
-            <Link href="/" className="flex items-center">
-              <span className="text-xl font-bold">NBU Journal</span>
+            <Link href="/" className="flex items-center space-x-2">
+              <Image 
+                src="/images/banner.jpg" 
+                alt="NBU Journal Logo" 
+                width={60} 
+                height={60} 
+                className="rounded-full object-cover border-2 border-white"
+              />
+              <span className="text-2xl font-bold">Nigerian British University Journal System</span>
             </Link>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex items-center space-x-6">
+          {/* Mobile Navigation */}
+          <div className="block md:hidden">
+            <MobileNav />
+          </div>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-6">
             <Link 
               href="/" 
               className={`hover:text-primary-200 ${

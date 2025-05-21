@@ -1,19 +1,38 @@
+import axios from 'axios';
 import { User, Journal, JournalStatus, JournalFilters } from '@/types';
-import corsAwareApi from './corsAwareApi';
 
-// Use the CORS-aware API client instead of creating a new one
-const api = corsAwareApi;
+// Check if code is running in browser environment
+const isBrowser = typeof window !== 'undefined';
 
-// Export the base URL for use in other parts of the application
-export const getApiBaseUrl = () => {
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL;
-  }
-  return 'https://nbu-journal-api.onrender.com/api';
-};
+// IMPORTANT: Hard-coded backend URL to avoid any caching issues
+const BACKEND_URL = 'https://nbu-journal-backend.onrender.com/api';
 
-// Export the API base URL for use in other components
-export const BACKEND_URL = getApiBaseUrl();
+// Create axios instance with the fixed backend URL
+const api = axios.create({
+  baseURL: BACKEND_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  withCredentials: true, // Important for cookies/auth if needed
+});
+
+console.log('API configured with URL:', BACKEND_URL);
+
+// Add auth token to requests if available
+api.interceptors.request.use(
+  (config) => {
+    // Only try to get token from localStorage in browser environment
+    if (isBrowser) {
+      const token = localStorage.getItem('token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+    console.log('Making request to:', config.url, 'with baseURL:', config.baseURL);
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 // Auth API
 export const authAPI = {
@@ -283,7 +302,8 @@ export const journalAPI = {
     return response.data;
   },
   unpublishJournal: async (journalId: number) => {
-    const response = await api.put(`/journals/${journalId}/unpublish`);
+    // When unpublishing, set the status back to 'approved' since that's the state before publishing
+    const response = await api.put(`/journals/${journalId}/unpublish`, { status: 'approved' });
     return response.data;
   },
 };

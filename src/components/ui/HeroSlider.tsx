@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 interface SlideProps {
   title: string;
@@ -51,36 +52,47 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
   }
 
   return (
-    <div className="relative h-[500px] overflow-hidden">
+    <div className="relative w-full h-[350px] sm:h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden">
       {/* Slides */}
       {slides.map((slide, index) => (
         <div 
           key={index}
-          className={`absolute inset-0 flex items-center justify-center transition-opacity duration-500 ease-in-out ${
+          className={`absolute inset-0 w-full h-full transition-opacity duration-500 ease-in-out ${
             index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
           }`}
-          style={{
-            backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url(${slide.imageUrl})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}
         >
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto text-center text-white">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 transform transition-transform duration-700 ease-out"
-                  style={{ 
-                    opacity: index === currentSlide ? 1 : 0,
-                    transform: index === currentSlide ? 'translateY(0)' : 'translateY(20px)'
-                  }}>
-                {slide.title}
-              </h1>
-              <p className="text-xl opacity-90 mb-8 transform transition-transform duration-700 delay-100 ease-out"
-                 style={{ 
-                   opacity: index === currentSlide ? 1 : 0,
-                   transform: index === currentSlide ? 'translateY(0)' : 'translateY(20px)'
-                 }}>
-                {slide.description}
-              </p>
+          {/* Hero image with proper styling */}
+          <div className="absolute inset-0 w-full h-full">
+            {/* Using regular img tag instead of Next.js Image for background images */}
+            <img 
+              src={slide.imageUrl} 
+              alt={slide.title}
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: 'center 30%' }}
+            />
+            
+            {/* Dark overlay for better text readability */}
+            <div className="absolute inset-0 bg-black opacity-40"></div>
+          </div>
+          {/* Text content with proper centering */}
+          <div className="absolute inset-0 flex items-center justify-center z-20">
+            <div className="container mx-auto px-4">
+              <div className="max-w-3xl mx-auto text-center text-white">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 transform transition-transform duration-700 ease-out shadow-text"
+                    style={{ 
+                      opacity: index === currentSlide ? 1 : 0,
+                      transform: index === currentSlide ? 'translateY(0)' : 'translateY(20px)'
+                    }}>
+                  {slide.title}
+                </h1>
+                <p className="text-lg sm:text-xl opacity-90 mb-8 transform transition-transform duration-700 delay-100 ease-out shadow-text"
+                   style={{ 
+                     opacity: index === currentSlide ? 1 : 0,
+                     transform: index === currentSlide ? 'translateY(0)' : 'translateY(20px)'
+                   }}>
+                  {slide.description}
+                </p>
+              </div>
             </div>
           </div>
         </div>
