@@ -40,7 +40,7 @@ const Layout: React.FC<LayoutProps> = ({
   // Hero slider content
   const heroSlides = [
     {
-      title: "Nigerian British University Journal Publications",
+      title: "Nigerian British Univeristy Journal Of Management, Social and Legal Studies",
       description: "Discover the latest academic research and publications from our university community",
       imageUrl: "/images/home.png"
     },

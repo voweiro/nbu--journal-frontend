@@ -44,11 +44,11 @@ export default function Home({ initialJournals }: HomeProps) {
       // Handle different response structures
       const fetchedJournals = response.journals || response.data?.journals || [];
       
-      // Filter to ensure only journals with 'published' status are shown
-      const onlyPublishedJournals = fetchedJournals.filter((journal: Journal) => journal.status === 'published');
-      console.log('Filtered published journals:', onlyPublishedJournals);
+      // Ensure only published journals are displayed
+      const publishedJournals = fetchedJournals.filter((journal: Journal) => journal.status === 'published');
+      console.log('Filtered published journals:', publishedJournals);
       
-      setJournals(onlyPublishedJournals);
+      setJournals(publishedJournals);
     } catch (error) {
       console.error('Error fetching journals:', error);
     } finally {
@@ -68,6 +68,8 @@ export default function Home({ initialJournals }: HomeProps) {
       description="Browse the latest academic journals published by Nigerian British University"
       showHero={true}
     >
+
+
 
       {/* Journals Section */}
       <section className="py-6 sm:py-8 md:py-12 bg-gray-50">
@@ -153,10 +155,12 @@ export default function Home({ initialJournals }: HomeProps) {
       </section>
 
       {/* About Section - Only shown to non-authenticated users */}
-      {!isAuthenticated && (
-        <section className="py-12 bg-blue-600">
+
+
+       {!isAuthenticated && (
+        <section className="py-12 bg">
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-bold text-white mb-8 text-center">About Our Journal System</h2>
+            <h2 className="text-2xl font-bold text-black mb-8 text-center">About The Journal/Editorial Policy </h2>
             
             <div className="max-w-6xl mx-auto">
               <div className="flex flex-col md:flex-row items-center gap-8">
@@ -173,32 +177,34 @@ export default function Home({ initialJournals }: HomeProps) {
                 </div>
                 
                 {/* Text content on the right for medium screens and up */}
-                <div className="md:w-1/2 text-white">
-                  <div className="prose prose-lg prose-invert max-w-none">
-                    <p>
-                      The Nigerian British University Journal Publication System is a platform for academic
-                      research and scholarly publications. Our system enables researchers, lecturers, and
-                      students to submit their work for peer review and publication.
-                    </p>
-                    <p>
-                      All published journals undergo a rigorous review process to ensure high-quality
-                      academic standards. Our diverse collection covers various fields of study and
-                      research areas.
-                    </p>
-                    <p>
-                      If you are a lecturer or researcher at Nigerian British University and would like to
-                      publish your work, please register for an account and submit your journal through our
-                      online system.
-                    </p>
-                  </div>
-                </div>
+                 <div className="w-full md:w-3/5 prose lg:prose-lg  text-[20px] text-black mx-auto">
+                <p>
+                  The Nigerian British University Journal of Management, Social and Legal Studies (JMSLS) is an
+                   academic research and professional journal published by the Faculty of Management and Social
+                    Sciences and Faculty of Law, Nigerian British University, Asa, Abia State, Nigeria..
+                </p>
+                <p>
+                JMSLS welcomes original contributions in form of empirical research articles, reviews, and case studies, on management, social and legal studies.
+                </p>
+                <p>
+                 The journal is published bi-annually. Articles are invited from interested contributors from all over
+                  Nigeria and beyond. The average length of articles is about 15 pages on A4 size paper, typed doubled-spaced.
+                   Using Times New Romans font. All manuscripts should be submitted in soft copies to the editor through nbujmsls @nbu.edu.ng. 
+                   The American Psychological Association Seventh Edition (APA7) Style of referencing is adopted for Management and Social Sciences,
+                    while all Legal Studies articles must follow the Nigerian Association of Law Teachers (NALT) citation and documentation style. 
+                    Each article should be accompanied by an abstract of not more than 250 words
+                </p>
+              </div>
               </div>
             </div>
           </div>
         </section>
       )}
+    
     </Layout>
   );
+
+  
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -214,10 +220,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       console.log('Direct API Response:', directData);
       
       if (directData.journals && directData.journals.length > 0) {
-        console.log('Found journals from direct test endpoint:', directData.journals);
+        // Filter to only include published journals
+        const publishedJournals = directData.journals.filter((journal: Journal) => journal.status === 'published');
+        console.log('Found published journals from direct test endpoint:', publishedJournals);
         return {
           props: {
-            initialJournals: directData.journals || [],
+            initialJournals: publishedJournals || [],
           },
         };
       }
@@ -235,9 +243,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     console.log('Regular API Response:', response);
     console.log('Journals from regular API:', response.journals);
     
+    // Filter to only include published journals
+    const publishedJournals = (response.journals || []).filter((journal: Journal) => journal.status === 'published');
+    console.log('Found published journals from regular API:', publishedJournals);
+    
     return {
       props: {
-        initialJournals: response.journals || [],
+        initialJournals: publishedJournals || [],
       },
     };
   } catch (error) {

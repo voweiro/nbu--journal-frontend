@@ -10,6 +10,9 @@ import { journalAPI, reviewAPI } from '@/utils/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { getFileUrl } from '@/utils/fileHelper';
 import { Journal, JournalStatus, UserRole, JournalReview } from '@/types';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Modal from '@/components/ui/Modal';
 
 const JournalDetailPage: React.FC = () => {
   const router = useRouter();
@@ -31,8 +34,11 @@ const JournalDetailPage: React.FC = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [isUnpublishing, setIsUnpublishing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [publicationNumber, setPublicationNumber] = useState('');
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
 
   // Only redirect if not authenticated for non-published journals
   useEffect(() => {
@@ -125,7 +131,7 @@ const JournalDetailPage: React.FC = () => {
     
     // Validate publication number
     if (!publicationNumber.trim()) {
-      alert('Please enter a publication number');
+      toast.error('Please enter a publication number');
       return;
     }
     
@@ -140,13 +146,57 @@ const JournalDetailPage: React.FC = () => {
       const { journal: updatedJournal } = await journalAPI.getJournalById(journal.id);
       setJournal(updatedJournal);
       
-      // Show success message
-      alert('Journal published successfully! It will now be visible on the home page.');
+      // Show success message using toast
+      toast.success('Journal published successfully! It will now be visible on the home page.');
+      
+      // Redirect to the published journal page
+      router.push(`/journals/published/${journal.id}`);
     } catch (error: any) {
       console.error('Error publishing journal:', error);
-      setError(error.response?.data?.message || 'Failed to publish journal');
+      const errorMessage = error.response?.data?.message || 'Failed to publish journal';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsPublishing(false);
+    }
+  };
+  
+  // Handle journal unpublish/republish
+  const handleUnpublishJournal = async () => {
+    if (!journal) return;
+
+    try {
+      setIsUnpublishing(true);
+      setError(null);
+      
+      if (journal.status === 'published') {
+        // Unpublish the journal by setting its status to 'approved'
+        await journalAPI.updateJournalStatus(journal.id, 'approved');
+        toast.success('Journal unpublished successfully');
+        
+        // Refresh journal data
+        const { journal: updatedJournal } = await journalAPI.getJournalById(journal.id);
+        setJournal(updatedJournal);
+      } else if (journal.status === 'approved') {
+        // Republish the journal
+        await journalAPI.publishJournal(journal.id, journal.publication_number || '');
+        toast.success('Journal republished successfully');
+        
+        // Refresh journal data
+        const { journal: updatedJournal } = await journalAPI.getJournalById(journal.id);
+        setJournal(updatedJournal);
+        
+        // Redirect to the published journal page
+        router.push(`/journals/published/${journal.id}`);
+      }
+      
+    } catch (error: any) {
+      console.error('Error unpublishing/republishing journal:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to unpublish/republish journal';
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setIsUnpublishing(false);
     }
   };
 
@@ -290,11 +340,17 @@ const JournalDetailPage: React.FC = () => {
       
       await journalAPI.deleteJournal(journal.id);
       
+      // Show success message
+      toast.success('Journal deleted successfully');
+      
       // Redirect to journals page after successful deletion
       router.push('/journals');
     } catch (error: any) {
       console.error('Error deleting journal:', error);
-      setError(error.response?.data?.message || 'Failed to delete journal');
+      const errorMessage = error.response?.data?.message || 'Failed to delete journal';
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
       setIsDeleting(false);
       setShowDeleteConfirm(false);
     }
@@ -335,6 +391,7 @@ const JournalDetailPage: React.FC = () => {
 
   return (
     <Layout title={`${journal.title} | NBU Journal System`}>
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="bg-gray-50 min-h-screen py-8">
         <div className="container mx-auto px-4">
           <div className="mb-6">
@@ -353,6 +410,36 @@ const JournalDetailPage: React.FC = () => {
                 </div>
 
                 {/* Publication details for approved journals */}
+                {journal.status === JournalStatus.PUBLISHED && (
+                  <div className="bg-blue-50 border border-blue-100 rounded-md p-4 mb-6">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-medium text-blue-800 mb-2">Publication Details</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                          <div>
+                            <span className="font-medium text-gray-700">Publication Number:</span>{' '}
+                            <span>{journal.publication_number}</span>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">Publication Date:</span>{' '}
+                            <span>{formatDate(journal.published_date || journal.updated_at)}</span>
+                          </div>
+                        </div>
+                      </div>
+                      {(user?.role === UserRole.ADMIN || user?.role === UserRole.SUPER_ADMIN) && (
+                        <Button
+                          variant="secondary"
+                          onClick={handleUnpublishJournal}
+                          disabled={isUnpublishing}
+                          className="bg-amber-500 hover:bg-amber-600 text-white"
+                        >
+                          {isUnpublishing ? 'Processing...' : 'Unpublish Journal'}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
                 {journal.status === JournalStatus.APPROVED && (
                   <div className="bg-green-50 border border-green-100 rounded-md p-4 mb-6">
                     <div className="flex justify-between items-start">
@@ -369,7 +456,7 @@ const JournalDetailPage: React.FC = () => {
                           </div>
                         </div>
                       </div>
-                      {user?.role === UserRole.REVIEWER && (
+                      {(user?.role === UserRole.ADMIN || user?.role === UserRole.SUPER_ADMIN) && (
                         <div className="flex flex-col space-y-2">
                           <div className="flex items-center space-x-2">
                             <label htmlFor="publicationNumber" className="text-sm font-medium text-gray-700">
@@ -385,14 +472,26 @@ const JournalDetailPage: React.FC = () => {
                               required
                             />
                           </div>
-                          <Button 
-                            variant="success" 
-                            onClick={handlePublishJournal}
-                            isLoading={isPublishing}
-                            disabled={!publicationNumber.trim()}
-                          >
-                            Publish Journal
-                          </Button>
+                          <div className="flex space-x-2">
+                            <Button 
+                              variant="success" 
+                              onClick={handlePublishJournal}
+                              disabled={isPublishing || !publicationNumber.trim()}
+                            >
+                              {isPublishing ? 'Publishing...' : 'Publish Journal'}
+                            </Button>
+                            
+                            {journal.publication_number && (
+                              <Button 
+                                variant="secondary"
+                                onClick={handleUnpublishJournal}
+                                disabled={isUnpublishing}
+                                className="bg-blue-500 hover:bg-blue-600 text-white"
+                              >
+                                {isUnpublishing ? 'Processing...' : 'Republish Journal'}
+                              </Button>
+                            )}
+                          </div>
                         </div>
                       )}
                     </div>
@@ -685,8 +784,8 @@ const JournalDetailPage: React.FC = () => {
                     </div>
                   )}
                   
-                  {/* Delete journal action (super-admin only) */}
-                  {user?.role === UserRole.SUPER_ADMIN && (
+                  {/* Delete journal action (admin and super-admin) */}
+                  {(user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN) && (
                     <div className="mt-6 pt-4 border-t border-gray-200">
                       <h4 className="font-medium text-gray-900 mb-2">Danger Zone</h4>
                       <p className="text-sm text-gray-600 mb-4">

@@ -19,13 +19,13 @@ const Header: React.FC = () => {
           <div className="flex items-center space-x-2">
             <Link href="/" className="flex items-center space-x-2">
               <Image 
-                src="/images/banner.jpg" 
+                src="/images/JMSLS.png" 
                 alt="NBU Journal Logo" 
-                width={60} 
-                height={60} 
-                className="rounded-full object-cover border-2 border-white"
+                width={80} 
+                height={80} 
+                className=" object-cover border-2 border-white"
               />
-              <span className="text-2xl font-bold">Nigerian British University Journal System</span>
+              <span className="text-[15px] font-bold">Nigerian British Univeristy Journal Of Management, Social and Legal Studies</span>
             </Link>
           </div>
 

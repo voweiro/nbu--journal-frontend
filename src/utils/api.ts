@@ -4,10 +4,15 @@ import { User, Journal, JournalStatus, JournalFilters } from '@/types';
 // Check if code is running in browser environment
 const isBrowser = typeof window !== 'undefined';
 
-// IMPORTANT: Hard-coded backend URL to avoid any caching issues
-const BACKEND_URL = 'https://nbu-journal-backend.onrender.com/api';
+// Determine if we're running on localhost
+const isLocalhost = isBrowser && window.location.hostname === 'localhost';
 
-// Create axios instance with the fixed backend URL
+// Use localhost:5000 for local development, otherwise use production URL
+const BACKEND_URL = isLocalhost 
+  ? 'http://localhost:5000/api'
+  : 'https://nbu-journal-backend.onrender.com/api';
+
+// Create axios instance with the appropriate backend URL
 const api = axios.create({
   baseURL: BACKEND_URL,
   headers: {
@@ -16,7 +21,7 @@ const api = axios.create({
   withCredentials: true, // Important for cookies/auth if needed
 });
 
-console.log('API configured with URL:', BACKEND_URL);
+console.log('API configured with URL:', BACKEND_URL, isLocalhost ? '(local development)' : '(production)');
 
 // Add auth token to requests if available
 api.interceptors.request.use(
@@ -33,8 +38,6 @@ api.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
-
-import { getPasswordResetUrl } from './config';
 
 // Auth API
 export const authAPI = {
@@ -84,18 +87,7 @@ export const authAPI = {
   },
 
   forgotPassword: async (email: string) => {
-    // Generate the correct password reset URL for the frontend
-    const resetUrl = getPasswordResetUrl(email, 'TOKEN_PLACEHOLDER');
-    const baseResetUrl = resetUrl.replace('TOKEN_PLACEHOLDER', '');
-
-    console.log('Sending password reset request with URL template:', baseResetUrl);
-
-    // Send the base URL to the backend so it can generate the correct link
-    const response = await api.post('/auth/forgot-password', { 
-      email,
-      reset_url_template: baseResetUrl
-    });
-
+    const response = await api.post('/auth/forgot-password', { email });
     return response.data;
   },
 
@@ -315,8 +307,7 @@ export const journalAPI = {
     return response.data;
   },
   unpublishJournal: async (journalId: number) => {
-    // When unpublishing, set the status back to 'approved' since that's the state before publishing
-    const response = await api.put(`/journals/${journalId}/unpublish`, { status: 'approved' });
+    const response = await api.put(`/journals/${journalId}/unpublish`);
     return response.data;
   },
 };
