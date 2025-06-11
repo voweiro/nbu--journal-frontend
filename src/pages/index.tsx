@@ -71,6 +71,26 @@ export default function Home({ initialJournals }: HomeProps) {
     >
 
 
+      <Head>
+        <title>Journal of Management, Social and Legal Studies – NBU</title>
+        <meta name="description" content="Official journal of Nigerian British University. Research in management, legal, and social sciences." />
+        <meta name="keywords" content="NBU, Journal, Management, Legal Studies, Social Science, Nigeria" />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://jmsls.nbu.edu.ng/" />
+
+        {/* Open Graph tags (for Facebook, WhatsApp previews) */}
+        <meta property="og:title" content="NBU Journal of Management, Social and Legal Studies" />
+        <meta property="og:description" content="Explore academic research and journal articles from NBU." />
+        <meta property="og:url" content="https://jmsls.nbu.edu.ng/" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://jmsls.nbu.edu.ng/og-image.jpg" />
+
+        {/* Twitter Card (for Twitter preview) */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="NBU Journal of Management, Social and Legal Studies" />
+        <meta name="twitter:description" content="Explore academic research and journal articles from NBU." />
+        <meta name="twitter:image" content="https://jmsls.nbu.edu.ng/og-image.jpg" />
+      </Head>
 
 
 
