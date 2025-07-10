@@ -4,6 +4,7 @@ import { GetServerSideProps } from 'next';
 import Layout from '@/components/layout/Layout';
 import JournalCard from '@/components/ui/JournalCard';
 import HeroSlider from '@/components/ui/HeroSlider';
+import ArticleViewer from '@/components/ui/ArticleViewer';
 import { journalAPI } from '@/utils/api';
 import { Journal, JournalFilters } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
@@ -173,6 +174,28 @@ export default function Home({ initialJournals }: HomeProps) {
                 <p className="text-gray-500 text-sm sm:text-base">No published journals found</p>
               </div>
             )}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Article Section */}
+      <section className="py-8 sm:py-12 bg-white">
+        <div className="container mx-auto px-3 sm:px-4">
+          <div className="mb-6 sm:mb-8">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 text-center mb-2">Featured Publication</h2>
+            <p className="text-gray-600 text-center mb-6">Access our latest journal volume</p>
+          </div>
+          
+          <div className="max-w-2xl mx-auto">
+            <ArticleViewer
+               title="NBU Journal of Management, Social and Legal Studies"
+               description="The inaugural volume of the Nigerian British University Journal of Management, Social and Legal Studies featuring cutting-edge research in management, social sciences, and legal studies from leading academics and researchers."
+               pdfUrl="/NBUJMSLS VOLUME 1.pdf"
+               fileName="NBUJMSLS_VOLUME_1.pdf"
+               volume="Volume 1"
+               publishedDate="Jan-Jun 2025"
+               className="shadow-lg"
+             />
           </div>
         </div>
       </section>
